@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include <unistd.h>  /* fork(), write(), close() */
 
+#include "Globals.h"
 #include "ServerThread.h"
 
 /*
@@ -43,7 +44,8 @@ void *socketHostThread( void *ptr )
 
 	pthread_t server_thread;
 
-	port = 12345;
+	port = tcpSocketPort;
+
 	for (;;) {
 		serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (-1 == serverSocket) {

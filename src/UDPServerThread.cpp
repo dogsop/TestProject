@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include <unistd.h>  /* fork(), write(), close() */
 
+#include "Globals.h"
 #include "UDPServerThread.h"
 
 #define BUFLEN 512
@@ -31,7 +32,7 @@ void *udpServerThread( void *ptr )
 
 	struct sockaddr_in serverName = { 0 };
 
-	port = 12233;
+	port = udpSocketPort;
 
 	for (;;) {
 		serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -80,7 +81,11 @@ void *udpServerThread( void *ptr )
 			printf("Received packet from %s:%d\nData: %s\n\n",
 					 inet_ntoa(clientName.sin_addr), ntohs(clientName.sin_port), buf);
 
-			sendto(serverSocket,buf,bytesReceived,0,(struct sockaddr *)&clientName,clientLength);
+			//sprintf(buf, "ServerSocket=%d|CamSocket=%d", tcpSocketPort, camSocketPort);
+			sprintf(buf, "ServerSocket=%d|CamSocket=%d", tcpSocketPort, 0);
+			printf("Sending %s\n", buf);
+
+			sendto(serverSocket,buf,strlen(buf),0,(struct sockaddr *)&clientName,clientLength);
 		}
 
 		close(serverSocket);
