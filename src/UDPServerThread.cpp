@@ -82,7 +82,7 @@ void *udpServerThread( void *ptr )
 					 inet_ntoa(clientName.sin_addr), ntohs(clientName.sin_port), buf);
 
 			//sprintf(buf, "ServerSocket=%d|CamSocket=%d", tcpSocketPort, camSocketPort);
-			sprintf(buf, "ServerSocket=%d|CamSocket=%d", tcpSocketPort, 0);
+			sprintf(buf, "ServerSocket=%d:CamSocket=%d", tcpSocketPort, 8888);
 			printf("Sending %s\n", buf);
 
 			sendto(serverSocket,buf,strlen(buf),0,(struct sockaddr *)&clientName,clientLength);
