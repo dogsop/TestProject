@@ -30,6 +30,7 @@ void *serverThread( void *ptr )
 
 	/* other local variables ------------------------------------------------ */
 	char in_buf[BUF_SIZE];           // Input buffer for GET request
+	int in_buf_offset = 0;
 	char out_buf[BUF_SIZE];          // Output buffer for HTML response
 	unsigned int buf_len;                    // Buffer length for file reads
 	int retcode;                    // Return code
@@ -54,7 +55,7 @@ void *serverThread( void *ptr )
 //			break;
 //		}
 
-		retcode = recv(socket, in_buf, 1, MSG_DONTWAIT | MSG_PEEK);
+		retcode = recv(socket, in_buf+in_buf_offset, 127, MSG_DONTWAIT | MSG_PEEK);
 		/* if receive error --- */
 		if (retcode < 0) {
 			if(errno == EAGAIN) {
@@ -68,9 +69,22 @@ void *serverThread( void *ptr )
 			break;
 		} else {
 			printf("retcode = %d\n", retcode);
-					//reading received bytes\n");
-			for(int Counter = 0; Counter < retcode; Counter++) {
-				recv(socket, in_buf, 1, 0);
+			while(retcode > 0) {
+				int bytesToRead = retcode;
+				if(bytesToRead > 127-in_buf_offset) {
+					bytesToRead = 127-in_buf_offset;
+				}
+				//reading received bytes\n");
+				int bytesRead = read(socket, in_buf+in_buf_offset, bytesToRead);
+				printf("bytesRead = %d\n", bytesRead);
+				in_buf[bytesRead+in_buf_offset] = '\0';
+
+				for(int Counter = 0; Counter < bytesRead; Counter++) {
+					if(in_buf[Counter] != '<') {
+						memmove(in_buf, in_buf+1, strlen(in_buf));
+					}
+				}
+				retcode -= bytesToRead;
 			}
 		}
 
